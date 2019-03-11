@@ -5,7 +5,7 @@ export default class ChatBar extends Component {
     return (
       <header>
         <div className='navbar'>
-          <p>Chatty</p>
+          <div className='navbar-brand'>Chatty</div>
         </div>
       </header>
     );

@@ -5,7 +5,8 @@ export default class ChatBar extends Component {
     return (
       <footer>
         <div className='chatbar'>
-          <p>Chatbar stuff here</p>
+          <textArea className='chatbar-username' name='userName' placeholder='Your name (optional)' />
+          <textArea className='chatbar-message' name='message' placeholder='Type a message and hit ENTER' />
         </div>
       </footer>
     );
