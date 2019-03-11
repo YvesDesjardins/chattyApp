@@ -3,11 +3,11 @@ import React, { Component } from 'react';
 export default class ChatBar extends Component {
   render() {
     return (
-      <footer>
-        <div className='chatbar'>
-          <p>Chatbar stuff here</p>
+      <header>
+        <div className='navbar'>
+          <p>Chatty</p>
         </div>
-      </footer>
+      </header>
     );
   }
 }
