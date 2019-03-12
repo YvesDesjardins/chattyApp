@@ -21,8 +21,9 @@ class App extends Component {
       }],
     };
 
-    this.onTyping = this.onTyping.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
+    this.onTypingUser = this.onTypingUser.bind(this)
+    this.onTypingMessage = this.onTypingMessage.bind(this)
   }
 
   componentDidMount() {
@@ -49,7 +50,10 @@ class App extends Component {
       });
     }
   }
-  onTyping(event) {
+  onTypingUser(event) {
+    this.setState({ currentUser: { name: event.target.value } })
+  }
+  onTypingMessage(event) {
     this.setState({ currentContent: event.target.value })
   }
 
@@ -58,7 +62,7 @@ class App extends Component {
       <div>
         <NavBar />
         <MessageList messages={this.state.messages} />
-        <ChatBar onKeyDown={this.onKeyDown} onTyping={this.onTyping} username={this.state.currentUser.name} content={this.state.currentContent} />
+        <ChatBar onKeyDown={this.onKeyDown} onTypingUser={this.onTypingUser} onTypingMessage={this.onTypingMessage} username={this.state.currentUser.name} content={this.state.currentContent} />
       </div>
     );
   }
