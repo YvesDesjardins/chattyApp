@@ -1,12 +1,10 @@
 import React from 'react';
 
-function Message() {
+export default function Message(props) {
   return (
     <div className='message' >
-      <div className='message-username'>Anonymous</div>
-      <div className='message-content'>This is a test of messages, currently things are hardcoded</div>
+      <div className='message-username'>{props.username}</div>
+      <div className='message-content'>{props.content}</div>
     </div>
   );
 }
-
-export default Message;

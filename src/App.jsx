@@ -5,11 +5,11 @@ import NavBar from './NavBar.jsx';
 import MessageList from './MessageList.jsx';
 
 class App extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
-      currentUser: { name: 'Bob' },
+      currentUser: { name: '' },
       messages: [{
         username: 'Bob',
         content: 'Has anyone seen my marbles?',
@@ -24,8 +24,8 @@ class App extends Component {
     return (
       <fragment>
         <NavBar />
-        <MessageList />
-        <ChatBar />
+        <MessageList messages={this.state.messages} />
+        <ChatBar username={this.state.currentUser.name} />
       </fragment>
     );
   }
