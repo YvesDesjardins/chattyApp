@@ -4,7 +4,10 @@ import Message from './Message.jsx';
 class MessageList extends Component {
   render() {
     return (
-      < Message />
+      <div>
+        < Message />
+        < Message />
+      </div>
     );
   }
 }
