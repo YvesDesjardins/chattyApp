@@ -5,11 +5,12 @@ import NavBar from './NavBar.jsx';
 import MessageList from './MessageList.jsx';
 
 class App extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
-      currentUser: { name: 'Bob' },
+      currentUser: { name: '' },
+      currentContent: '',
       messages: [{
         username: 'Bob',
         content: 'Has anyone seen my marbles?',
@@ -19,14 +20,50 @@ class App extends Component {
         content: 'No, I think you lost them. You lost your marbles Bob. You lost them for good.'
       }],
     };
+
+    this.onKeyDown = this.onKeyDown.bind(this)
+    this.onTypingUser = this.onTypingUser.bind(this)
+    this.onTypingMessage = this.onTypingMessage.bind(this)
   }
+
+  componentDidMount() {
+    setTimeout(() => {
+      // Add a new message to the list of messages in the data store
+      const newMessage = { id: 3, username: 'Michelle', content: 'Hello there!' };
+      const messages = this.state.messages.concat(newMessage)
+      // Update the state of the app component.
+      // Calling setState will trigger a call to render() in App and all child components.
+      this.setState({ messages: messages })
+    }, 3000);
+  }
+
+  onKeyDown(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      const newMessage = {
+        username: this.state.currentUser.name === '' ? 'Anonymous' : this.state.currentUser.name,
+        content: this.state.currentContent,
+      };
+      this.setState({
+        messages: this.state.messages.concat(newMessage),
+        currentContent: '',
+      });
+    }
+  }
+  onTypingUser(event) {
+    this.setState({ currentUser: { name: event.target.value } })
+  }
+  onTypingMessage(event) {
+    this.setState({ currentContent: event.target.value })
+  }
+
   render() {
     return (
-      <fragment>
+      <div>
         <NavBar />
-        <MessageList />
-        <ChatBar />
-      </fragment>
+        <MessageList messages={this.state.messages} />
+        <ChatBar onKeyDown={this.onKeyDown} onTypingUser={this.onTypingUser} onTypingMessage={this.onTypingMessage} username={this.state.currentUser.name} content={this.state.currentContent} />
+      </div>
     );
   }
 }
