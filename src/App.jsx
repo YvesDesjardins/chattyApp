@@ -4,11 +4,12 @@ import ChatBar from './ChatBar.jsx';
 import NavBar from './NavBar.jsx';
 import MessageList from './MessageList.jsx';
 
+const socket = new WebSocket('ws://localhost:3001');
+
 export default function AppHook() {
   const [currentUser, setCurrentUser] = useState({ name: '' });
   const [currentContent, setCurrentContent] = useState('');
   const [messages, setMessages] = useState([{}]);
-  const [socket, setSocket] = useState(new WebSocket('ws://localhost:3001'));
 
   useEffect(() => {
     socket.onmessage = (event) => {
