@@ -11,14 +11,8 @@ class App extends Component {
     this.state = {
       currentUser: { name: '' },
       currentContent: '',
-      messages: [{
-        username: 'Bob',
-        content: 'Has anyone seen my marbles?',
-      },
-      {
-        username: 'Anonymous',
-        content: 'No, I think you lost them. You lost your marbles Bob. You lost them for good.'
-      }],
+      messages: [{}],
+      socket: {}
     };
 
     this.onKeyDown = this.onKeyDown.bind(this)
@@ -27,14 +21,19 @@ class App extends Component {
   }
 
   componentDidMount() {
-    setTimeout(() => {
-      // Add a new message to the list of messages in the data store
-      const newMessage = { id: 3, username: 'Michelle', content: 'Hello there!' };
-      const messages = this.state.messages.concat(newMessage)
-      // Update the state of the app component.
-      // Calling setState will trigger a call to render() in App and all child components.
-      this.setState({ messages: messages })
-    }, 3000);
+    const socket = new WebSocket('ws://192.168.88.161:3001');
+
+    this.setState({ socket });
+    socket.onmessage = (event) => {
+      const { username, content } = JSON.parse(event.data);
+
+      this.setState({
+        messages: this.state.messages.concat({
+          username,
+          content
+        })
+      });
+    }
   }
 
   onKeyDown(event) {
@@ -44,10 +43,8 @@ class App extends Component {
         username: this.state.currentUser.name === '' ? 'Anonymous' : this.state.currentUser.name,
         content: this.state.currentContent,
       };
-      this.setState({
-        messages: this.state.messages.concat(newMessage),
-        currentContent: '',
-      });
+      this.state.socket.send(JSON.stringify(newMessage));
+      this.setState({ currentContent: '' });
     }
   }
   onTypingUser(event) {
