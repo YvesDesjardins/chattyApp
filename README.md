@@ -20,6 +20,9 @@ Install the dependencies and start the server.
 ```
 npm install
 npm start
+cd chatty_server
+npm install
+node server.js
 open http://localhost:3000
 ```
 
