@@ -1,67 +1,50 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import ChatBar from './ChatBar.jsx';
 import NavBar from './NavBar.jsx';
 import MessageList from './MessageList.jsx';
 
-class App extends Component {
-  constructor(props) {
-    super(props);
+export default function AppHook() {
+  const [currentUser, setCurrentUser] = useState({ name: '' });
+  const [currentContent, setCurrentContent] = useState('');
+  const [messages, setMessages] = useState([{}]);
+  const [socket, setSocket] = useState(new WebSocket('ws://localhost:3001'));
 
-    this.state = {
-      currentUser: { name: '' },
-      currentContent: '',
-      messages: [{}],
-      socket: {}
-    };
-
-    this.onKeyDown = this.onKeyDown.bind(this)
-    this.onTypingUser = this.onTypingUser.bind(this)
-    this.onTypingMessage = this.onTypingMessage.bind(this)
-  }
-
-  componentDidMount() {
-    const socket = new WebSocket('ws://192.168.88.161:3001');
-
-    this.setState({ socket });
+  useEffect(() => {
     socket.onmessage = (event) => {
       const { username, content } = JSON.parse(event.data);
 
-      this.setState({
-        messages: this.state.messages.concat({
-          username,
-          content
-        })
-      });
+      setMessages(messages.concat({
+        username,
+        content
+      }));
     }
-  }
+  });
 
-  onKeyDown(event) {
+  function onKeyDown(event) {
     if (event.key === 'Enter') {
       event.preventDefault();
       const newMessage = {
-        username: this.state.currentUser.name === '' ? 'Anonymous' : this.state.currentUser.name,
-        content: this.state.currentContent,
+        username: currentUser.name === '' ? 'Anonymous' : currentUser.name,
+        content: currentContent,
       };
-      this.state.socket.send(JSON.stringify(newMessage));
-      this.setState({ currentContent: '' });
+
+      socket.send(JSON.stringify(newMessage));
+      setCurrentContent('');
     }
   }
-  onTypingUser(event) {
-    this.setState({ currentUser: { name: event.target.value } })
+  function onTypingUser(event) {
+    setCurrentUser({ name: event.target.value });
   }
-  onTypingMessage(event) {
-    this.setState({ currentContent: event.target.value })
+  function onTypingMessage(event) {
+    setCurrentContent(event.target.value);
   }
 
-  render() {
-    return (
-      <div>
-        <NavBar />
-        <MessageList messages={this.state.messages} />
-        <ChatBar onKeyDown={this.onKeyDown} onTypingUser={this.onTypingUser} onTypingMessage={this.onTypingMessage} username={this.state.currentUser.name} content={this.state.currentContent} />
-      </div>
-    );
-  }
+  return (
+    <div>
+      <NavBar />
+      <MessageList messages={messages} />
+      <ChatBar onKeyDown={onKeyDown} onTypingUser={onTypingUser} onTypingMessage={onTypingMessage} username={currentUser.name} content={currentContent} />
+    </div>
+  );
 }
-export default App;

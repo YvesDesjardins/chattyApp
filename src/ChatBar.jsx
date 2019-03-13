@@ -5,8 +5,8 @@ export default function ChatBar(props) {
   return (
     <footer>
       <div className='chatbar'>
-        <textArea onChange={props.onTypingUser} className='chatbar-username' name='userName' placeholder='Your name (optional)' value={props.username} />
-        <textArea onKeyDown={props.onKeyDown} onChange={props.onTypingMessage} className='chatbar-message' name='message' placeholder='Type a message and hit ENTER' value={props.content} />
+        <textarea onChange={props.onTypingUser} className='chatbar-username' name='userName' placeholder='Your name (optional)' value={props.username} />
+        <textarea onKeyDown={props.onKeyDown} onChange={props.onTypingMessage} className='chatbar-message' name='message' placeholder='Type a message and hit ENTER' value={props.content} />
       </div>
     </footer>
   );
