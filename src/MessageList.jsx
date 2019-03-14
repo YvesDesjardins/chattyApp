@@ -3,12 +3,16 @@ import React from 'react';
 import Message from './Message.jsx';
 
 export default function MessageList(props) {
-  const parseMessages = props.messages.map((message) => (
-    <Message
-      key={Math.trunc(Math.random() * 1000000)}
-      username={message.username}
-      content={message.content} />
-  ));
+  const parseMessages =
+    props.messages.map((message) => {
+      return (
+        <Message
+          key={message.id}
+          username={message.username}
+          content={message.content}
+          type={message.type} />
+      );
+    });
 
   return (
     <div>

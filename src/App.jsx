@@ -1,67 +1,87 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 
 import ChatBar from './ChatBar.jsx';
 import NavBar from './NavBar.jsx';
 import MessageList from './MessageList.jsx';
 
-class App extends Component {
-  constructor(props) {
-    super(props);
+const socket = new WebSocket('ws://localhost:3001');
 
-    this.state = {
-      currentUser: { name: '' },
-      currentContent: '',
-      messages: [{}],
-      socket: {}
-    };
+export default function AppHook() {
+  const [tempUser, setTempUser] = useState('');
+  const [currentUser, setCurrentUser] = useState({ name: 'Anonymous' });
+  const [currentContent, setCurrentContent] = useState('');
+  const [messages, setMessages] = useState([]);
+  const [userCount, setUserCount] = useState();
 
-    this.onKeyDown = this.onKeyDown.bind(this)
-    this.onTypingUser = this.onTypingUser.bind(this)
-    this.onTypingMessage = this.onTypingMessage.bind(this)
+  socket.onmessage = (event) => {
+    console.log(event.data);
+    processResponse(JSON.parse(event.data));
   }
 
-  componentDidMount() {
-    const socket = new WebSocket('ws://192.168.88.161:3001');
-
-    this.setState({ socket });
-    socket.onmessage = (event) => {
-      const { username, content } = JSON.parse(event.data);
-
-      this.setState({
-        messages: this.state.messages.concat({
+  // process server response for displaying
+  function processResponse({ type, username, content, id }) {
+    switch (type) {
+      case 'userCount':
+        setUserCount(content);
+        break;
+      default:
+        setMessages(messages.concat({
           username,
-          content
-        })
-      });
+          content,
+          id,
+          type,
+        }));
+        break;
     }
   }
 
-  onKeyDown(event) {
+  // check and handle enter key to submit
+  function onKeyDown(event) {
     if (event.key === 'Enter') {
       event.preventDefault();
-      const newMessage = {
-        username: this.state.currentUser.name === '' ? 'Anonymous' : this.state.currentUser.name,
-        content: this.state.currentContent,
-      };
-      this.state.socket.send(JSON.stringify(newMessage));
-      this.setState({ currentContent: '' });
+      if (event.target.className === 'chatbar-username') {
+        checkUserChanged();
+      } else {
+        sendMessage();
+      }
     }
   }
-  onTypingUser(event) {
-    this.setState({ currentUser: { name: event.target.value } })
+  // handle updating states for both content and username
+  function onTypingUser(event) {
+    setTempUser(event.target.value);
   }
-  onTypingMessage(event) {
-    this.setState({ currentContent: event.target.value })
+  function onTypingMessage(event) {
+    setCurrentContent(event.target.value);
   }
 
-  render() {
-    return (
-      <div>
-        <NavBar />
-        <MessageList messages={this.state.messages} />
-        <ChatBar onKeyDown={this.onKeyDown} onTypingUser={this.onTypingUser} onTypingMessage={this.onTypingMessage} username={this.state.currentUser.name} content={this.state.currentContent} />
-      </div>
-    );
+  // send message to server
+  function sendMessage() {
+    const newMessage = {
+      username: currentUser.name === '' ? 'Anonymous' : currentUser.name,
+      content: currentContent,
+    };
+
+    socket.send(JSON.stringify(newMessage));
+    setCurrentContent('');
   }
+  // ensure username has changed before sending update to server
+  function checkUserChanged() {
+    if (currentUser.name !== tempUser || currentUser.name === 'Anonymous' && tempUser === '') {
+      const message = {
+        content: '/userChange ',
+        oldUser: currentUser.name,
+        newUser: tempUser,
+      }
+      socket.send(JSON.stringify(message));
+      setCurrentUser({ name: tempUser });
+    }
+  }
+
+  return (
+    <div>
+      <NavBar userCount={userCount} />
+      <MessageList messages={messages} />
+      <ChatBar onKeyDown={onKeyDown} onTypingUser={onTypingUser} onTypingMessage={onTypingMessage} username={tempUser} content={currentContent} />
+    </div>
+  );
 }
-export default App;
