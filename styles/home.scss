@@ -54,6 +54,11 @@ body {
 
 .message-content {
   flex: 8;
+
+  .highlight {
+    font-style: italic;
+    color: red;
+  }
 }
 
 .message-username {
