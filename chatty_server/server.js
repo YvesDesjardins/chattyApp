@@ -46,9 +46,10 @@ wss.on('connection', (ws) => {
 // broadcast helper to send to all connected clients 
 wss.broadcast = function broadcast(data) {
   wss.clients.forEach(function each(client) {
-    if (client.readyState === SocketServer.OPEN) {
-      client.send(data);
-    }
+    // if (client.readyState === SocketServer.OPEN) {
+    client.send(data);
+    console.log('sent update user');
+    // }
   });
 };
 

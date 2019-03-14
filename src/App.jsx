@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 import ChatBar from './ChatBar.jsx';
 import NavBar from './NavBar.jsx';
@@ -13,11 +13,10 @@ export default function AppHook() {
   const [messages, setMessages] = useState([]);
   const [userCount, setUserCount] = useState();
 
-  useEffect(() => {
-    socket.onmessage = (event) => {
-      processResponse(JSON.parse(event.data));
-    }
-  });
+  socket.onmessage = (event) => {
+    console.log(event.data);
+    processResponse(JSON.parse(event.data));
+  }
 
   // process server response for displaying
   function processResponse({ type, username, content, id }) {
