@@ -10,17 +10,27 @@ export default function AppHook() {
   const [currentUser, setCurrentUser] = useState({ name: '' });
   const [currentContent, setCurrentContent] = useState('');
   const [messages, setMessages] = useState([{}]);
+  const [userCount, setUserCount] = useState();
 
   useEffect(() => {
     socket.onmessage = (event) => {
-      const { username, content } = JSON.parse(event.data);
-
-      setMessages(messages.concat({
-        username,
-        content
-      }));
+      processResponse(JSON.parse(event.data));
     }
   });
+
+  function processResponse({ type, username, content }) {
+    switch (type) {
+      case 'userCount':
+        setUserCount(content);
+        break;
+      default:
+        setMessages(messages.concat({
+          username,
+          content
+        }));
+        break;
+    }
+  }
 
   function onKeyDown(event) {
     if (event.key === 'Enter') {
@@ -43,7 +53,7 @@ export default function AppHook() {
 
   return (
     <div>
-      <NavBar />
+      <NavBar userCount={userCount} />
       <MessageList messages={messages} />
       <ChatBar onKeyDown={onKeyDown} onTypingUser={onTypingUser} onTypingMessage={onTypingMessage} username={currentUser.name} content={currentContent} />
     </div>
