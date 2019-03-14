@@ -14,7 +14,6 @@ export default function AppHook() {
   const [userCount, setUserCount] = useState();
 
   socket.onmessage = (event) => {
-    console.log(event.data);
     processResponse(JSON.parse(event.data));
   }
 
