@@ -5,7 +5,7 @@ export default function NavBar(props) {
     <header>
       <div className='navbar'>
         <div className='navbar-brand'>Chatty</div>
-        <div className='navbar-usercount'>Users connected: {props.userCount}</div>
+        <div className='navbar-usercount'>{props.userCount} users connected</div>
       </div>
     </header>
   );
