@@ -25,16 +25,13 @@ export default function AppHook() {
       case 'userCount':
         setUserCount(content);
         break;
-      case 'gifMessage':
-      case 'notificationMessage':
-      case 'textMessage':
+      default:
         setMessages(messages.concat({
           username,
           content,
           id,
+          type,
         }));
-        break;
-      default:
         break;
     }
   }

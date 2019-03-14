@@ -9,7 +9,8 @@ export default function MessageList(props) {
         <Message
           key={message.id}
           username={message.username}
-          content={message.content} />
+          content={message.content}
+          type={message.type} />
       );
     });
 

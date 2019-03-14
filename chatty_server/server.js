@@ -3,6 +3,8 @@
 const express = require('express');
 const SocketServer = require('ws');
 const uuid = require('uuid/v4');
+const request = require('request');
+const key = require('./secret');
 
 // Set the port to 3001
 const PORT = 3001;
@@ -32,7 +34,7 @@ wss.on('connection', (ws) => {
     message.type = 'textMessage';
     message.sync = true;
 
-    parseMessage(message);
+    parseMessage(message, ws);
   });
   // Set up a callback for when a client closes the socket. This usually means they closed their browser.
   ws.on('close', () => {
@@ -62,15 +64,29 @@ function updateClientList() {
 }
 
 // parse client messages for / commands
-function parseMessage(message) {
+function parseMessage(message, ws) {
   if (message.content[0] === '/') {
-    const command = message.content.split(' ')[0].slice(1);
-    switch (command) {
+    const command = message.content.split(' ');
+    switch (command[0].slice(1)) {
+      case 'giphy':
       case 'gif':
         message.type = 'gifMessage';
-        message.content = message.content.replace('/gif ', '');
         message.sync = false;
-        wss.broadcast(JSON.stringify(message));
+        request({
+          json: true,
+          uri: 'https://api.giphy.com/v1/gifs/search?api_key=' + key() + '&q=' + command.slice(1).join('+')
+        }, (error, response, body) => {
+          if (error) {
+            ws.send({
+              username: 'ChattyBot',
+              content: 'Giphy could not find anything',
+              type: 'errorMessage'
+            });
+          } else {
+            message.content = body.data[0].images.original.url;
+            wss.broadcast(JSON.stringify(message));
+          }
+        });
         break;
       case 'userChange':
         message.type = 'notificationMessage';
@@ -81,7 +97,7 @@ function parseMessage(message) {
         message.type = 'errorMessage';
         message.content = 'Your / command was incorrect, please try again';
         message.sync = false;
-        // ws.send(JSON.stringify(message));
+        ws.send(JSON.stringify(message));
         break;
     }
   }
