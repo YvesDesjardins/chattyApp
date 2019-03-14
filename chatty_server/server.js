@@ -68,6 +68,7 @@ function parseMessage(message, ws) {
   if (message.content[0] === '/') {
     const command = message.content.split(' ');
     switch (command[0].slice(1)) {
+      // gif magic happens here
       case 'giphy':
       case 'gif':
         message.type = 'gifMessage';
@@ -88,6 +89,7 @@ function parseMessage(message, ws) {
           }
         });
         break;
+        // handle user changes and notify clients
       case 'userChange':
         message.type = 'notificationMessage';
         message.username = 'ChattyBot';
@@ -95,6 +97,7 @@ function parseMessage(message, ws) {
         break;
       default:
         message.type = 'errorMessage';
+        message.username = 'ChattyBot';
         message.content = 'Your / command was incorrect, please try again';
         message.sync = false;
         ws.send(JSON.stringify(message));

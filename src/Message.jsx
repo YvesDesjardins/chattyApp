@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 
+// parse message to check if gif or not
 export default function Message(props) {
   function parseMessage() {
     if (props.type === 'gifMessage') {
