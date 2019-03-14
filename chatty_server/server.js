@@ -23,11 +23,13 @@ const wss = new SocketServer.Server({
 // the ws parameter in the callback.
 wss.on('connection', (ws) => {
   console.log('Client connected');
+  ws.username = '';
   updateClientList();
 
   ws.on('message', (data) => {
     const message = JSON.parse(data);
     message.id = uuid();
+    message.type = 'textMessage';
     message.sync = true;
 
     parseMessage(message);
@@ -58,7 +60,31 @@ function updateClientList() {
 }
 
 function parseMessage(message) {
+  if (message.content[0] === '/') {
+    const command = message.content.split(' ')[0].slice(1);
+    switch (command) {
+      case 'gif':
+        message.type = 'gifMessage';
+        message.content = message.content.replace('/gif ', '');
+        message.sync = false;
+        wss.broadcast(JSON.stringify(message));
+        break;
+      case 'userChange':
+        message.type = 'notificationMessage';
+        message.username = 'ChattyBot';
+        message.content = '*' + message.oldUser + '*' + ' has become ' + '*' + message.newUser + '*';
+        break;
+      default:
+        message.type = 'errorMessage';
+        message.content = 'Your / command was incorrect, please try again';
+        message.sync = false;
+        // ws.send(JSON.stringify(message));
+        break;
+    }
+  }
+
   console.log('Sent data!');
-  console.log(`User ${message.username} said ${message.content} with ID ${message.id}`);
-  wss.broadcast(JSON.stringify(message));
+  if (message.sync) {
+    wss.broadcast(JSON.stringify(message));
+  }
 }
