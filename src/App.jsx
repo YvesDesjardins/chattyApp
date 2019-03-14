@@ -19,6 +19,7 @@ export default function AppHook() {
     }
   });
 
+  // process server response for displaying
   function processResponse({ type, username, content, id }) {
     switch (type) {
       case 'userCount':
@@ -38,6 +39,7 @@ export default function AppHook() {
     }
   }
 
+  // check and handle enter key to submit
   function onKeyDown(event) {
     if (event.key === 'Enter') {
       event.preventDefault();
@@ -48,6 +50,7 @@ export default function AppHook() {
       }
     }
   }
+  // handle updating states for both content and username
   function onTypingUser(event) {
     setTempUser(event.target.value);
   }
@@ -55,6 +58,7 @@ export default function AppHook() {
     setCurrentContent(event.target.value);
   }
 
+  // send message to server
   function sendMessage() {
     const newMessage = {
       username: currentUser.name === '' ? 'Anonymous' : currentUser.name,
@@ -64,8 +68,9 @@ export default function AppHook() {
     socket.send(JSON.stringify(newMessage));
     setCurrentContent('');
   }
+  // ensure username has changed before sending update to server
   function checkUserChanged() {
-    if (currentUser.name !== tempUser) {
+    if (currentUser.name !== tempUser || currentUser.name === 'Anonymous' && tempUser === '') {
       const message = {
         content: '/userChange ',
         oldUser: currentUser.name,

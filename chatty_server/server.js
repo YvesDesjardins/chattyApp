@@ -23,11 +23,11 @@ const wss = new SocketServer.Server({
 // the ws parameter in the callback.
 wss.on('connection', (ws) => {
   console.log('Client connected');
-  ws.username = '';
   updateClientList();
 
   ws.on('message', (data) => {
     const message = JSON.parse(data);
+    // set initial state of message
     message.id = uuid();
     message.type = 'textMessage';
     message.sync = true;
@@ -41,6 +41,7 @@ wss.on('connection', (ws) => {
   });
 });
 
+// broadcast helper to send to all connected clients 
 wss.broadcast = function broadcast(data) {
   wss.clients.forEach(function each(client) {
     if (client.readyState === SocketServer.OPEN) {
@@ -49,6 +50,7 @@ wss.broadcast = function broadcast(data) {
   });
 };
 
+// update connected clients with current number of clients
 function updateClientList() {
   const message = {
     type: 'userCount',
@@ -59,6 +61,7 @@ function updateClientList() {
   wss.broadcast(JSON.stringify(message));
 }
 
+// parse client messages for / commands
 function parseMessage(message) {
   if (message.content[0] === '/') {
     const command = message.content.split(' ')[0].slice(1);
