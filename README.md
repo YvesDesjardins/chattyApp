@@ -24,8 +24,8 @@ open http://localhost:3000
 
 ### Usage
 
-* Type messages and submit them
-* Change your username
+* Type messages and hit enter submit them
+* Type a new username and hit enter to submit
 * Try /gif or /giphy along with a search query to send gifs
 
 ### Dependencies
