@@ -1,8 +1,9 @@
 /* eslint-disable react/prop-types */
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import Message from './Message.jsx';
 
 export default function MessageList(props) {
+  const reference = useRef();
   const parseMessages =
     props.messages.map((message) => {
       return (
@@ -14,9 +15,14 @@ export default function MessageList(props) {
       );
     });
 
+  useEffect(() => {
+    setTimeout(function () { reference.current.scrollIntoView({ behavior: 'smooth' }); }, 1000);
+  });
+
   return (
     <div>
       {parseMessages}
+      <div ref={reference} />
     </div>
   );
 }
