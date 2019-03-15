@@ -17,7 +17,7 @@ export default function MessageList(props) {
 
   useEffect(() => {
     setTimeout(function () { reference.current.scrollIntoView({ behavior: 'smooth' }); }, 1000);
-  });
+  }, [props.messages]);
 
   return (
     <div>
