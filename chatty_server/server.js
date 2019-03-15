@@ -24,7 +24,6 @@ const wss = new SocketServer.Server({
 // When a client connects they are assigned a socket, represented by
 // the ws parameter in the callback.
 wss.on('connection', (ws) => {
-  console.log('Client connected');
   updateClientList();
 
   ws.on('message', (data) => {
@@ -38,7 +37,6 @@ wss.on('connection', (ws) => {
   });
   // Set up a callback for when a client closes the socket. This usually means they closed their browser.
   ws.on('close', () => {
-    console.log('Client disconnected');
     updateClientList();
   });
 });
@@ -46,10 +44,9 @@ wss.on('connection', (ws) => {
 // broadcast helper to send to all connected clients 
 wss.broadcast = function broadcast(data) {
   wss.clients.forEach(function each(client) {
-    // if (client.readyState === SocketServer.OPEN) {
-    client.send(data);
-    console.log('sent update user');
-    // }
+    if (client.readyState === SocketServer.OPEN) {
+      client.send(data);
+    }
   });
 };
 
@@ -60,14 +57,13 @@ function updateClientList() {
     content: wss.clients.size,
   };
 
-  console.log(`Connected clients: ${message.content}`);
   wss.broadcast(JSON.stringify(message));
 }
 
 // parse client messages for / commands
 function parseMessage(message, ws) {
-  if (message.content[0] === '/') {
-    const command = message.content.split(' ');
+  const command = message.content.split(' ');
+  if (command[0][0] === '/' && command.join('').replace(' ', '') !== '') {
     switch (command[0].slice(1)) {
       // gif magic happens here
       case 'giphy':
@@ -78,15 +74,16 @@ function parseMessage(message, ws) {
           json: true,
           uri: 'https://api.giphy.com/v1/gifs/search?api_key=' + key() + '&q=' + command.slice(1).join('+')
         }, (error, response, body) => {
-          if (error) {
-            ws.send({
-              username: 'ChattyBot',
-              content: 'Giphy could not find anything',
-              type: 'errorMessage'
-            });
-          } else {
+          if (!error && body.data[0]) {
             message.content = body.data[0].images.original.url;
             wss.broadcast(JSON.stringify(message));
+          } else {
+            ws.send(JSON.stringify({
+              username: 'ChattyBot',
+              content: 'Giphy could not find anything',
+              type: 'errorMessage',
+              id: uuid(),
+            }));
           }
         });
         break;
@@ -106,7 +103,6 @@ function parseMessage(message, ws) {
     }
   }
 
-  console.log('Sent data!');
   if (message.sync) {
     wss.broadcast(JSON.stringify(message));
   }
